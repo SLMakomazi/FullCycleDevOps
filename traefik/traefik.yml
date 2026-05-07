@@ -1,0 +1,151 @@
+# Traefik Configuration
+# API Gateway and Ingress Controller
+
+api:
+  dashboard: true
+  insecure: true
+  debug: true
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: ":443"
+    http:
+      middlewares:
+        - security-headers@file
+        - rate-limit@file
+      tls:
+        options: modern@file
+        certResolver: letsencrypt
+  metrics:
+    address: ":8082"
+
+providers:
+  kubernetesCRD:
+    allowCrossNamespace: true
+    allowExternalNameServices: true
+    ingressClass: traefik
+    namespaces:
+      - devops-observability
+      - monitoring
+      - traefik
+  kubernetesIngress:
+    allowCrossNamespace: true
+    allowExternalNameServices: true
+    ingressClass: traefik
+    namespaces:
+      - devops-observability
+      - monitoring
+      - traefik
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: traefik
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
+
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addServicesLabels: true
+    manualRouting: true
+    entryPoint: metrics
+
+tracing:
+  jaeger:
+    samplingServerURL: "http://jaeger:14268/api/sampling"
+    localAgentHostPort: "jaeger:6831"
+    samplingType: "const"
+    samplingParam: 1.0
+  zipkin:
+    httpEndpoint: "http://zipkin:9411/api/v2/spans"
+    sameSpan: false
+    id128Bit: true
+    debug: false
+
+accessLog:
+  filePath: "/var/log/traefik/access.log"
+  format: json
+  fields:
+    defaultMode: keep
+    names:
+      ClientUsername: drop
+      RequestHost: keep
+      RequestPort: keep
+      RequestMethod: keep
+      RequestPath: keep
+      RequestProtocol: keep
+      RequestScheme: keep
+      RequestHost: keep
+      RequestPort: keep
+      RequestPath: keep
+      RequestMethod: keep
+      RequestProtocol: keep
+      RequestScheme: keep
+      RequestQuery: keep
+      RequestRemoteAddr: keep
+      RequestReferer: keep
+      RequestUserAgent: keep
+      RequestContentSize: keep
+      ResponseStatusCode: keep
+      ResponseContentSize: keep
+      ResponseHeaders: keep
+      RequestHeaders: keep
+      Duration: keep
+      StartUTC: keep
+      Timestamp: keep
+    headers:
+      defaultMode: keep
+      names:
+        User-Agent: keep
+        Authorization: drop
+        Content-Type: keep
+
+log:
+  level: INFO
+  filePath: "/var/log/traefik/traefik.log"
+  format: json
+
+pilot:
+  token: ""
+
+experimental:
+  plugins:
+    traefik-plugin-redis:
+      moduleName: "github.com/traefik/traefik-plugin-redis"
+      version: "v0.2.1"
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: "admin@devops-observability.local"
+      storage: "/etc/traefik/acme/acme.json"
+      httpChallenge:
+        entryPoint: web
+  cloudflare:
+    acme:
+      email: "admin@devops-observability.local"
+      storage: "/etc/traefik/acme/acme-cloudflare.json"
+      dnsChallenge:
+        provider: cloudflare
+        resolvers:
+          - "1.1.1.1:53"
+          - "1.0.0.1:53"
+
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: false
+
+serversTransport:
+  insecureSkipVerify: true
+  maxIdleConnsPerHost: 200
+  rootCAs:
+    - "/etc/traefik/ca-cert.pem"

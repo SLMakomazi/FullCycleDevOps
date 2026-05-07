@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-service
+  namespace: devops-observability
+  labels:
+    app: traefik
+    component: ingress
+spec:
+  selector:
+    app: traefik
+  ports:
+  - name: web
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  - name: websecure
+    port: 443
+    targetPort: 443
+    protocol: TCP
+  - name: metrics
+    port: 8082
+    targetPort: 8082
+    protocol: TCP
+  - name: dashboard
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-metrics
+  namespace: devops-observability
+  labels:
+    app: traefik
+    component: ingress
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8082"
+    prometheus.io/path: "/metrics"
+spec:
+  selector:
+    app: traefik
+  ports:
+  - name: metrics
+    port: 8082
+    targetPort: 8082
+    protocol: TCP
+  type: ClusterIP

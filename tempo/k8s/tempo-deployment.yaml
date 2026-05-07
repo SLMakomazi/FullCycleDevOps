@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tempo
+  namespace: devops-observability
+  labels:
+    app: tempo
+    component: observability
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tempo
+  template:
+    metadata:
+      labels:
+        app: tempo
+        component: observability
+    spec:
+      containers:
+      - name: tempo
+        image: grafana/tempo:2.4.1
+        args:
+          - "-config.file=/etc/tempo.yaml"
+          - "-auth.enabled=false"
+        env:
+          - name: K8S_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: K8S_POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+        ports:
+          - name: http
+            containerPort: 3200
+            protocol: TCP
+          - name: grpc
+            containerPort: 9095
+            protocol: TCP
+          - name: otlp-grpc
+            containerPort: 4317
+            protocol: TCP
+          - name: otlp-http
+            containerPort: 4318
+            protocol: TCP
+          - name: memberlist
+            containerPort: 7946
+            protocol: TCP
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/tempo.yaml
+            subPath: tempo.yaml
+            readOnly: true
+          - name: config-volume
+            mountPath: /etc/tempo/overrides.yaml
+            subPath: overrides.yaml
+            readOnly: true
+          - name: tempo-data
+            mountPath: /tmp/tempo
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeout: 10s
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 15
+          timeout: 10s
+      volumes:
+      - name: config-volume
+        configMap:
+          name: tempo-config
+      - name: tempo-data
+        persistentVolumeClaim:
+          claimName: tempo-pvc

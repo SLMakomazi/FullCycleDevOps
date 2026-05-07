@@ -1,0 +1,37 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      timeInterval: "15s"
+      queryTimeout: "60s"
+      httpMethod: "POST"
+    secureJsonData: {}
+
+  - name: Graylog
+    type: graylog-datasource
+    access: proxy
+    url: http://graylog:9000
+    editable: true
+    jsonData:
+      uri: http://graylog:9000
+      username: admin
+      password: admin
+    secureJsonData:
+      password: admin
+
+  - name: MongoDB
+    type: mongodb
+    access: proxy
+    url: mongodb://mongodb:27017
+    database: devops_observability
+    editable: true
+    jsonData:
+      uri: mongodb://mongodb:27017
+      database: devops_observability
+    secureJsonData: {}

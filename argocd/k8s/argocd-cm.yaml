@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/component: argocd
+data:
+  application.resourceTrackingMethod: tree
+  statusbadge.enabled: "true"
+  users.anonymous.enabled: "true"
+  accounts.admin: login
+  accounts.devops: login
+  accounts.readonly: login
+  url: "https://argocd.localhost"
+  oidc.config: |
+    name: AzureAD
+    issuer: https://login.microsoftonline.com/{tenant-id}/v2.0
+    clientID: {client-id}
+    clientSecret: $oidc.azure.clientSecret
+    requestedScopes: ["openid", "profile", "email"]
+    requestedIDTokenClaims: {"email": true}
+  repositories: |
+    - type: git
+      url: https://github.com/your-org/devops-observability.git
+      name: devops-observability
+      insecure: true
+    - type: helm
+      name: prometheus-community
+      url: https://prometheus-community.github.io/helm-charts
+    - type: helm
+      name: grafana
+      url: https://grafana.github.io/helm-charts
+    - type: helm
+      name: traefik
+      url: https://helm.traefik.io/traefik
+    - type: helm
+      name: opentelemetry
+      url: https://open-telemetry.github.io/helm-charts
+  resource.customizations.health.argoproj.io_Application: |
+    health.lua: |
+      hs = {}
+      if obj.status ~= nil then
+        if obj.status.health ~= nil then
+          hs.status = obj.status.health.status
+          if obj.status.health.status == "Healthy" then
+            hs.message = obj.status.health.message
+            return hs
+          end
+        end
+      end
+      hs.status = "Progressing"
+      hs.message = "Waiting for reconciliation"
+      return hs
+  resource.customizations.health.argoproj.io_ApplicationSet: |
+    health.lua: |
+      hs = {}
+      if obj.status ~= nil then
+        if obj.status.conditions ~= nil then
+          for i, condition in ipairs(obj.status.conditions) do
+            if condition.type == "Ready" then
+              if condition.status == "True" then
+                hs.status = "Healthy"
+                hs.message = condition.message
+                return hs
+              else
+                hs.status = "Degraded"
+                hs.message = condition.message
+                return hs
+              end
+            end
+          end
+        end
+      end
+      hs.status = "Progressing"
+      hs.message = "Waiting for reconciliation"
+      return hs

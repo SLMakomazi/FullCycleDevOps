@@ -1,0 +1,72 @@
+# ArgoCD Project Configuration
+# Defines project boundaries and permissions
+
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: devops-observability
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: devops-observability
+    app.kubernetes.io/component: gitops
+spec:
+  description: DevOps & Observability Platform
+  sourceRepos:
+  - https://github.com/your-org/devops-observability.git
+  - https://prometheus-community.github.io/helm-charts
+  - https://grafana.github.io/helm-charts
+  - https://helm.traefik.io/traefik
+  - https://open-telemetry.github.io/helm-charts
+  destinations:
+  - namespace: devops-observability
+    server: https://kubernetes.default.svc
+  - namespace: monitoring
+    server: https://kubernetes.default.svc
+  - namespace: argocd
+    server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  orphanedResources:
+    warn: false
+    keep: false
+  roles:
+  - name: admin
+    description: Full access to the project
+    policies:
+    - p, proj:devops-observability:admin, *, *, *, allow
+    groups:
+    - argocd-admins
+    - devops-team
+  - name: readonly
+    description: Read-only access to the project
+    policies:
+    - p, proj:devops-observability:readonly, applications, *, get, allow
+    - p, proj:devops-observability:readonly, applications, *, list, allow
+    groups:
+    - developers
+    - qa-team
+  - name: deployer
+    description: Can deploy but cannot delete
+    policies:
+    - p, proj:devops-observability:deployer, applications, *, create, allow
+    - p, proj:devops-observability:deployer, applications, *, update, allow
+    - p, proj:devops-observability:deployer, applications, *, sync, allow
+    groups:
+    - ci-cd-systems
+  syncWindows:
+  - kind: allow
+    schedule: '0 2 * * *'  # 2 AM UTC
+    duration: 1h
+    applications:
+    - '*'
+    manualSync: true
+  - kind: deny
+    schedule: '0 6-18 * * 1-5'  # Business hours (6 AM - 6 PM, Mon-Fri)
+    duration: 12h
+    applications:
+    - '*'
+    manualSync: true
