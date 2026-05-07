@@ -6,7 +6,7 @@ This document explains the purpose and benefits of every file and directory in t
 
 ```
 FullCycleDevOps/
-├── api/                     # Spring Boot microservice with OpenTelemetry
+├── api/                     # Spring Boot with OpenTelemetry
 ├── bamboo/                  # Bamboo CI/CD pipeline configuration
 ├── rancher/                 # Rancher Kubernetes management
 ├── graylog/                 # Graylog centralized logging
@@ -30,7 +30,7 @@ FullCycleDevOps/
 ## 🚀 API Directory (`api/`)
 
 ### Purpose
-Contains the complete Spring Boot microservice with MongoDB integration, providing RESTful CRUD operations with full observability.
+Contains the complete Spring Boot application with MongoDB integration, providing RESTful CRUD operations with full observability.
 
 ### Files and Their Benefits
 

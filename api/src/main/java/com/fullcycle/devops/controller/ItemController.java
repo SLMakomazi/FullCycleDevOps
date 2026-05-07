@@ -5,6 +5,7 @@ import com.fullcycle.devops.dto.ItemResponse;
 import com.fullcycle.devops.service.ItemService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,12 +22,13 @@ import java.util.List;
 public class ItemController {
 
     private final ItemService itemService;
-    private final Counter itemCreatedCounter;
-    private final Counter itemUpdatedCounter;
-    private final Counter itemDeletedCounter;
+    private final MeterRegistry meterRegistry;
+    private Counter itemCreatedCounter;
+    private Counter itemUpdatedCounter;
+    private Counter itemDeletedCounter;
 
-    public ItemController(ItemService itemService, MeterRegistry meterRegistry) {
-        this.itemService = itemService;
+    @PostConstruct
+    public void initCounters() {
         this.itemCreatedCounter = Counter.builder("items.created.total")
                 .description("Total number of items created")
                 .register(meterRegistry);

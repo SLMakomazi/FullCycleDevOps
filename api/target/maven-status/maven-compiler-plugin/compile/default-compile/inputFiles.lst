@@ -1,0 +1,10 @@
+C:\Users\Wipro\CascadeProjects\FullCycleDevOps\api\src\main\java\com\fullcycle\devops\model\Item.java
+C:\Users\Wipro\CascadeProjects\FullCycleDevOps\api\src\main\java\com\fullcycle\devops\dto\ItemResponse.java
+C:\Users\Wipro\CascadeProjects\FullCycleDevOps\api\src\main\java\com\fullcycle\devops\exception\ResourceNotFoundException.java
+C:\Users\Wipro\CascadeProjects\FullCycleDevOps\api\src\main\java\com\fullcycle\devops\repository\ItemRepository.java
+C:\Users\Wipro\CascadeProjects\FullCycleDevOps\api\src\main\java\com\fullcycle\devops\service\ItemService.java
+C:\Users\Wipro\CascadeProjects\FullCycleDevOps\api\src\main\java\com\fullcycle\devops\config\DotenvConfig.java
+C:\Users\Wipro\CascadeProjects\FullCycleDevOps\api\src\main\java\com\fullcycle\devops\controller\ItemController.java
+C:\Users\Wipro\CascadeProjects\FullCycleDevOps\api\src\main\java\com\fullcycle\devops\dto\ItemRequest.java
+C:\Users\Wipro\CascadeProjects\FullCycleDevOps\api\src\main\java\com\fullcycle\devops\DevOpsObservabilityApplication.java
+C:\Users\Wipro\CascadeProjects\FullCycleDevOps\api\src\main\java\com\fullcycle\devops\exception\GlobalExceptionHandler.java
