@@ -1,0 +1,100 @@
+# AlertManager Configuration
+# Defines how alerts are handled and routed to notification channels
+
+global:
+  # SMTP configuration for email notifications
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'alertmanager@devops-observability.local'
+  smtp_auth_username: 'your-email@gmail.com'
+  smtp_auth_password: 'your-app-password'
+  smtp_require_tls: true
+
+  # Slack webhook configuration (optional)
+  slack_api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+
+# Route configuration
+route:
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+  receiver: 'web.hook'
+  routes:
+  - match:
+      severity: critical
+    receiver: 'critical-alerts'
+  - match:
+      severity: warning
+    receiver: 'warning-alerts'
+
+# Receivers define how notifications are sent
+receivers:
+  # Webhook receiver for custom integrations
+  - name: 'web.hook'
+    webhook_configs:
+      - url: 'http://localhost:5001/'
+        send_resolved: true
+
+  # Email receiver for critical alerts
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'admin@devops-observability.local'
+        subject: '[CRITICAL] {{ .GroupLabels.alertname }} - {{ .Status }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Labels: {{ range .Labels.SortedPairs }}{{ .Name }}={{ .Value }} {{ end }}
+          {{ end }}
+        html: |
+          <h2>{{ .GroupLabels.alertname }}</h2>
+          <table>
+            <tr><th>Status</th><td>{{ .Status }}</td></tr>
+            <tr><th>Severity</th><td>{{ .GroupLabels.severity }}</td></tr>
+          </table>
+          {{ range .Alerts }}
+          <h3>{{ .Annotations.summary }}</h3>
+          <p>{{ .Annotations.description }}</p>
+          <table>
+            {{ range .Labels.SortedPairs }}
+            <tr><td>{{ .Name }}</td><td>{{ .Value }}</td></tr>
+            {{ end }}
+          </table>
+          {{ end }}
+        send_resolved: true
+
+  # Slack receiver for warning alerts
+  - name: 'warning-alerts'
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#alerts'
+        title: 'DevOps Alert: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
+          *Status:* {{ .Status }}
+          {{ end }}
+        send_resolved: true
+        color: 'warning'
+
+# Inhibition rules prevent alert spam
+inhibit_rules:
+  # Inhibit info alerts if critical alert is firing
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'info'
+    equal: ['alertname', 'cluster', 'service']
+
+  # Inhibit warning alerts if critical alert is firing
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'cluster', 'service']
+
+# Templates for customizing alert messages
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'

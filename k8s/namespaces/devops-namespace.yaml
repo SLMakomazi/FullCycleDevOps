@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: devops-observability
-  labels:
-    name: devops-observability
-    environment: production
