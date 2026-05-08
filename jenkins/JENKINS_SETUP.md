@@ -179,7 +179,7 @@ docker logs -f jenkins
 
 After setup, validate by:
 
-1. **Access Jenkins**: http://localhost:8080
+1. **Access Jenkins**: http://localhost:8081
 2. **Run Pipeline**: Trigger build manually or via webhook
 3. **Check Results**: Verify Docker image appears in Docker Hub
 4. **Test Deployment**: Pull and run the new image
