@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  api:
+  backend:
     image: slmakomazi/fullcycle-api:v1
     container_name: devops-api
     ports:

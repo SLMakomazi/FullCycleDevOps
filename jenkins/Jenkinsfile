@@ -1,0 +1,73 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKER_IMAGE = 'slmakomazi/fullcycle-api'
+        DOCKER_TAG = 'latest'
+        DOCKERFILE_PATH = './api/Dockerfile'
+        BUILD_CONTEXT = './api'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/SLMakomazi/FullCycleDevOps.git', changelog: false
+            }
+        }
+        
+        stage('Maven Build') {
+            steps {
+                dir('api') {
+                    sh 'mvn clean compile'
+                }
+            }
+        }
+        
+        stage('Maven Test') {
+            steps {
+                dir('api') {
+                    sh 'mvn test'
+                }
+                publishTestResults testResultsPattern: 'api/target/surefire-reports/*.xml'
+            }
+        }
+        
+        stage('Docker Build') {
+            steps {
+                script {
+                    docker.withRegistry('', 'docker-hub-credentials') {
+                        def customImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}", "${BUILD_CONTEXT} -f ${DOCKERFILE_PATH}")
+                        customImage.push()
+                    }
+                }
+            }
+        }
+        
+        stage('Docker Tag Latest') {
+            steps {
+                script {
+                    docker.withRegistry('', 'docker-hub-credentials') {
+                        def customImage = docker.image("${DOCKER_IMAGE}:latest")
+                        customImage.push('latest')
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+            echo "Docker image pushed: ${DOCKER_IMAGE}:${DOCKER_TAG}"
+        }
+        failure {
+            echo 'Pipeline failed!'
+            mail to: 'devops@example.com',
+                 subject: "Pipeline Failed: ${env.JOB_NAME} - ${env.BUILD_NUMBER}",
+                 body: "The pipeline failed. Check the logs at ${env.BUILD_URL}"
+        }
+    }
+}
