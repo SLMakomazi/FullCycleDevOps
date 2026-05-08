@@ -26,9 +26,15 @@ pipeline {
         stage('Maven Test') {
             steps {
                 dir('api') {
-                    sh 'mvn test'
+                    sh 'mvn test -Dsurefire.useFile=true -Dmaven.test.failure.ignore=false'
                 }
-                junit 'api/target/surefire-reports/*.xml'
+                script {
+                    if (fileExists('api/target/surefire-reports')) {
+                        junit 'api/target/surefire-reports/*.xml'
+                    } else {
+                        echo "No test reports found - skipping JUnit publish"
+                    }
+                }
             }
         }
         
