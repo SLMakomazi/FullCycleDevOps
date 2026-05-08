@@ -41,8 +41,8 @@ pipeline {
         stage('Docker Build') {
             steps {
                 script {
+                    def customImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}", "${BUILD_CONTEXT} -f ${DOCKERFILE_PATH}")
                     docker.withRegistry('', 'docker-hub-credentials') {
-                        def customImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}", "${BUILD_CONTEXT} -f ${DOCKERFILE_PATH}")
                         customImage.push()
                     }
                 }
@@ -52,8 +52,8 @@ pipeline {
         stage('Docker Tag Latest') {
             steps {
                 script {
+                    def customImage = docker.image("${DOCKER_IMAGE}:latest")
                     docker.withRegistry('', 'docker-hub-credentials') {
-                        def customImage = docker.image("${DOCKER_IMAGE}:latest")
                         customImage.push('latest')
                     }
                 }
