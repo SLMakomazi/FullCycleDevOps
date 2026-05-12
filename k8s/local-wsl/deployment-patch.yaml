@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fullcycle-api
+spec:
+  template:
+    spec:
+      containers:
+      - name: fullcycle-api
+        env:
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: fullcycle-config-local
+              key: LOG_LEVEL
+        - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+          valueFrom:
+            configMapKeyRef:
+              name: fullcycle-config-local
+              key: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+      volumes:
+      - name: logs
+        emptyDir: {}
+      nodeSelector:
+        kubernetes.io/hostname: k3s-fullcycle

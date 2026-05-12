@@ -1,0 +1,31 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: fullcycle-api-local-wsl
+
+bases:
+- ../
+
+namespace: devops-observability
+
+patchesStrategicMerge:
+- path: deployment-patch.yaml
+
+images:
+- name: fullcycle-api
+  newTag: dev
+
+replicas:
+- name: fullcycle-api
+  count: 1
+
+commonLabels:
+  environment: local-wsl
+  tier: development
+
+configMapGenerator:
+- name: fullcycle-config-local
+  literals:
+  - LOG_LEVEL=DEBUG
+  - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,metrics,prometheus

@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: fullcycle-project
+  namespace: argocd
+spec:
+  description: FullCycle DevOps Project
+  sourceRepos:
+  - repoURL: https://github.com/SLMakomazi/FullCycleDevOps.git
+  destinations:
+  - namespace: devops-observability
+    server: https://kubernetes.default.svc
+  - namespace: argocd
+    server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+  - group: ''
+    kind: Namespace
+  namespaceResourceWhitelist:
+  - group: ''
+    kind: ''
+  roles:
+  - name: read-only
+    policies:
+    - p, proj:fullcycle-project:read-only, applications, get, *, allow
+    - p, proj:fullcycle-project:read-only, applications, list, *, allow
+    groups:
+    - dex:argocd-readonly
+  - name: admin
+    policies:
+    - p, proj:fullcycle-project:admin, applications, *, *, allow
+    groups:
+    - dex:argocd-admins
+  syncWindows:
+  - kind: allow
+    schedule: '0 1 * * *'
+    duration: 1h
+    applications:
+    - sync
+    manualSync: true
