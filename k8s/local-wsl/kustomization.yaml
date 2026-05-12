@@ -5,7 +5,7 @@ metadata:
   name: fullcycle-api-local-wsl
 
 bases:
-- ../
+- ../base
 
 namespace: devops-observability
 
