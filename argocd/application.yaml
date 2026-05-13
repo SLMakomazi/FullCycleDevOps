@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: fullcycle-api
+  name: devops-fullcycle
   namespace: argocd
 spec:
   project: default
