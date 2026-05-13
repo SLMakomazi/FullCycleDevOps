@@ -121,7 +121,7 @@ pipeline {
             echo "   - ${DOCKER_IMAGE}:latest (production tag)"
         }
         failure {
-            echo "❌ Build failed! Check logs for details."
+            echo "❌ Build failed! Check logs for details ."
         }
     }
 }
