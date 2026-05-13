@@ -5,10 +5,11 @@ metadata:
   labels:
     app: fullcycle-api
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
   - port: 80
     targetPort: 8080
+    nodePort: 30086
     protocol: TCP
     name: http
   selector:

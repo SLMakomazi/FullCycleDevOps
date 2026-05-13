@@ -9,10 +9,11 @@ scrape_configs:
       - targets: ['localhost:9090']
 
   - job_name: 'spring-boot-api'
+    scheme: 'http'
     metrics_path: '/actuator/prometheus'
     scrape_interval: 15s
     static_configs:
-      - targets: ['host.docker.internal:30085']
+      - targets: ['host.docker.internal:30086']
     relabel_configs:
       - source_labels: [__address__]
         target_label: instance

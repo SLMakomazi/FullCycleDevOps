@@ -89,6 +89,11 @@ kubectl apply -f argocd/
 - **Destination**: `devops-observability` namespace
 - **Sync Policy**: Automated with self-healing
 
+## 🌐 **Ports & Access**
+- **ArgoCD**: `https://<node-ip>:30085` (ArgoCD remains on NodePort `30085`)
+- **API NodePort**: `http://<node-ip>:30086` for `fullcycle-api`
+- **Metrics**: `http://<node-ip>:30086/actuator/prometheus`
+
 ## 📊 **Monitoring**
 
 ### **Health Checks**
