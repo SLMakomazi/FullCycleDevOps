@@ -8,6 +8,7 @@ resources:
 - deployment.yaml
 - service.yaml
 - secrets.yaml
+- prometheus-service.yaml
 
 commonLabels:
   app.kubernetes.io/name: fullcycle-api
