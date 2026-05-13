@@ -10,4 +10,4 @@ images:
   newTag: dev
 
 patches:
-- deployment-patch.yaml
+- path: deployment-patch.yaml

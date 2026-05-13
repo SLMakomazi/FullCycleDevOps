@@ -68,3 +68,5 @@ spec:
       securityContext:
         fsGroup: 1000
       terminationGracePeriodSeconds: 30
+patches:
+- path: deployment-patch.yaml
