@@ -9,5 +9,11 @@ images:
   newName: slmakomazi/fullcycle-api
   newTag: v1.11
 
+configMapGenerator:
+- name: fullcycle-config-local
+  literals:
+  - LOG_LEVEL=DEBUG
+  - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,metrics,prometheus
+
 patches:
 - path: deployment-patch.yaml
