@@ -86,15 +86,21 @@ pipeline {
 
         stage('Update K8s Manifests') {
             steps {
-                dir('.') {
-                    sh '''
-                        git config user.email "jenkins@ci.local"
-                        git config user.name "Jenkins CI"
-                        sed -i "s#^\\([[:space:]]*newTag:[[:space:]]*\\).*#\\1v1.${BUILD_NUMBER}#" k8s/local-wsl/kustomization.yaml
-                        git add k8s/local-wsl/kustomization.yaml
-                        git commit -m "Update Kustomize image tag to ${DOCKER_TAG}"
-                        git push origin main
-                    '''
+                script {
+                    // Update the newTag property inside the correct directory path layout
+                    sh "sed -i 's/newTag:.*/newTag: v1.${BUILD_NUMBER}/g' k8s/local-wsl/kustomization.yaml"
+                    
+                    // Securely wrap git operations inside your existing github_access credential vault block
+                    withCredentials([usernamePassword(credentialsId: 'github_access', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                        sh """
+                            git config --global user.email "jenkins@wsl.local"
+                            git config --global user.name "Jenkins Automation"
+                            git remote set-url origin https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/SLMakomazi/FullCycleDevOps.git
+                            git add k8s/local-wsl/kustomization.yaml
+                            git commit -m "chore: jenkins auto-updated overlay image tag to v1.${BUILD_NUMBER}"
+                            git push origin main
+                        """
+                    }
                 }
             }
         }
