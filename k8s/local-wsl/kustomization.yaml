@@ -9,5 +9,5 @@ images:
   newName: slmakomazi/fullcycle-api
   newTag: dev
 
-patchesStrategicMerge:
+patches:
 - deployment-patch.yaml

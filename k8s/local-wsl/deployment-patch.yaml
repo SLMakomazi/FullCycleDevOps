@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: devops-fullcycle
+  name: fullcycle-api
 spec:
   template:
     spec:
       containers:
-      - name: devops-fullcycle
+      - name: fullcycle-api
         env:
         - name: LOG_LEVEL
           valueFrom:
