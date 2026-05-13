@@ -31,5 +31,3 @@ spec:
       volumes:
       - name: logs
         emptyDir: {}
-      nodeSelector:
-        kubernetes.io/hostname: k3s-fullcycle
