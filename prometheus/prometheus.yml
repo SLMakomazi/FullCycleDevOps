@@ -12,60 +12,8 @@ scrape_configs:
     metrics_path: '/actuator/prometheus'
     scrape_interval: 15s
     static_configs:
-      - targets: ['fullcycle-api-metrics.devops-observability.svc.cluster.local:8080']
+      - targets: ['host.docker.internal:8080']
     relabel_configs:
       - source_labels: [__address__]
         target_label: instance
         replacement: 'spring-boot-api'
-
-  # MongoDB Exporter (if needed)
-  - job_name: 'mongodb'
-    static_configs:
-      - targets: ['mongodb:27017']
-    metrics_path: /metrics
-    scrape_interval: 30s
-
-  # Graylog Metrics (if available)
-  - job_name: 'graylog'
-    static_configs:
-      - targets: ['graylog:9000']
-    metrics_path: /api/metrics/multiple
-    scrape_interval: 30s
-
-  # Node Exporter for system metrics
-  - job_name: 'node-exporter'
-    static_configs:
-      - targets: ['node-exporter:9100']
-    scrape_interval: 30s
-
-  # cAdvisor for container metrics
-  - job_name: 'cadvisor'
-    static_configs:
-      - targets: ['cadvisor:8080']
-    metrics_path: /metrics
-    scrape_interval: 30s
-
-  # Traefik metrics
-  - job_name: 'traefik'
-    static_configs:
-      - targets: ['traefik:8082']
-    metrics_path: /metrics
-    scrape_interval: 30s
-
-  # OpenTelemetry Collector metrics
-  - job_name: 'otel-collector'
-    static_configs:
-      - targets: ['otel-collector:8888']
-    metrics_path: /metrics
-    scrape_interval: 30s
-
-# Alerting rules
-alerting:
-  alertmanagers:
-    - static_configs:
-        - targets:
-          # - alertmanager:9093
-
-# Load rules once and periodically evaluate them
-rule_files:
-  - "alert_rules.yml"
