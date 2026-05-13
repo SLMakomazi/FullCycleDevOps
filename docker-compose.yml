@@ -122,6 +122,9 @@ services:
     ports:
       - "3000:3000"
 
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
     environment:
       GF_SECURITY_ADMIN_PASSWORD: admin123
       GF_USERS_ALLOW_SIGN_UP: "false"
