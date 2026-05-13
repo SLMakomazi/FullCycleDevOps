@@ -26,7 +26,11 @@ pipeline {
         stage('Maven Build') {
             steps {
                 dir('api') {
-                    sh 'mvn clean compile'
+                    script {
+                        docker.image('maven:3.9.8-eclipse-temurin-17').inside {
+                            sh 'mvn clean compile'
+                        }
+                    }
                 }
             }
         }
@@ -34,7 +38,11 @@ pipeline {
         stage('Maven Test') {
             steps {
                 dir('api') {
-                    sh 'mvn test -Dsurefire.useFile=true -Dmaven.test.failure.ignore=false'
+                    script {
+                        docker.image('maven:3.9.8-eclipse-temurin-17').inside {
+                            sh 'mvn test -Dsurefire.useFile=true -Dmaven.test.failure.ignore=false'
+                        }
+                    }
                 }
                 script {
                     if (fileExists('api/target/surefire-reports')) {
