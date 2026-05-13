@@ -7,7 +7,7 @@ resources:
 images:
 - name: fullcycle-api
   newName: slmakomazi/fullcycle-api
-  newTag: v1.18
+  newTag: v1.19
 
 configMapGenerator:
 - name: fullcycle-config-local
