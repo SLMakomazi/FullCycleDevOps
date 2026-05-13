@@ -8,16 +8,15 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-  # Spring Boot API Application
-  - job_name: 'devops-api'
+  - job_name: 'spring-boot-api'
     metrics_path: '/actuator/prometheus'
     scrape_interval: 15s
     static_configs:
-      - targets: ['fullcycle-api:80']
+      - targets: ['fullcycle-api-metrics.devops-observability.svc.cluster.local:8080']
     relabel_configs:
       - source_labels: [__address__]
         target_label: instance
-        replacement: 'devops-api'
+        replacement: 'spring-boot-api'
 
   # MongoDB Exporter (if needed)
   - job_name: 'mongodb'
