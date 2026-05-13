@@ -82,7 +82,7 @@ pipeline {
                     sh '''
                         git config user.email "jenkins@ci.local"
                         git config user.name "Jenkins CI"
-                        sed -i "s#^\([[:space:]]*newTag:[[:space:]]*\).*#\1v1.${BUILD_NUMBER}#" k8s/local-wsl/kustomization.yaml
+                        sed -i "s#^\\([[:space:]]*newTag:[[:space:]]*\\).*#\\1v1.${BUILD_NUMBER}#" k8s/local-wsl/kustomization.yaml
                         git add k8s/local-wsl/kustomization.yaml
                         git commit -m "Update Kustomize image tag to ${DOCKER_TAG}"
                         git push origin main
