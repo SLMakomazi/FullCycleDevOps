@@ -7,7 +7,7 @@ resources:
 images:
 - name: fullcycle-api
   newName: slmakomazi/fullcycle-api
-  newTag: dev
+  newTag: v1.6
 
 patches:
 - path: deployment-patch.yaml
